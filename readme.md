@@ -1,11 +1,13 @@
 # Google Maps coordinate picker # 
 
-Simple jQuery Plugin that turns a div into a coordinate picker, using a Google
+Simple jQuery plugin that turns a div into a coordinate picker, using a Google
 Map. It holds an internal array of markers that are currently present on the map and fires events when a marker is added, dragged or deleted. Other code can then catch these events and for example update the value of a hidden markers input field of a form.
 
 ## Installation and usage ##
-Installation via Bower:
-
+The plugin can be installed via Bower. Add the following line to your javascript:
+```
+require('tg-coordinate-picker');
+```
 
 Usage:
 Create a div with a suitable width and height that will hold the Google Map. If the div has a class `coordinate-picker`, then simply call
@@ -16,12 +18,11 @@ $('div.coordinatePicker').coordinatePicker();
 
 on document ready. 
 
-By default, multiple markers can be placed on the map, by just clicking the map. To delete a marker, simply click it while holding down "d" on your keyboard. It is possible to configure another button for this too, see below.
+By default, multiple markers can be placed on the map, by just clicking the map. To delete a marker, simply click it while holding down "d" on your keyboard. It is possible to configure another button for the delete action, see below.
 
-Next you should write some code that catches the events fired by the coordinate picker, to update a hidden form field for example where you store the marker info.
+Next you should write some code that catches the events fired by the coordinate picker, to update for example a hidden form field where you store the marker info.
 
 See below for which events are fired.
-
 
 ## Standard configuration and options ##
 By default, the following options are set:
@@ -47,7 +48,8 @@ By default, the following options are set:
 }
 ```
 Some remarks:
-Currently, the default key to hold down to delete a marker by a left mouse click is "d". And it is possible to use a custom marker icon. Below is an example of options passed in to use such a custom icon:
++ Currently, the default key to hold down to delete a marker by a left mouse click is "d".
++ It is possible to use a custom marker icon. Below is an example of options passed in to use such a custom icon:
 
 ```
 {

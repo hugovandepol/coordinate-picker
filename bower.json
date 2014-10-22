@@ -1,0 +1,14 @@
+{
+  "name": "tg-coordinate-picker",
+  "version": "0.0.1",
+  "homepage": "https://github.com/hugovandepol/coordinate-picker",
+  "authors": [
+    "Hugo <hugovandepol@gmail.com>"
+  ],
+  "description": "Simple jQuery plugin that turns a div into a coordinate picker, using a Google Map.",
+  "main": "\"./coordinate_picker.js\"",
+  "dependencies": {
+      "jquery": ">=1.7.0",
+  }
+}
+
