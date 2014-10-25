@@ -139,7 +139,6 @@ CoordinatePicker.prototype.triggerCenterChanged = function () {
    var center = this.map.getCenter(),
        data = {map: this.map, lat: center.lat(), lng: center.lng()};
    this.elem.trigger('coordinate_picker.center_changed', data);
-   console.log('center changed', data);
 };
 
 /**

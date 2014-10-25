@@ -17,7 +17,7 @@ Next you should write some code that catches the events fired by the coordinate 
 See below for which events are fired.
 
 ## Standard configuration and options ##
-By default, the following options are set:
+By default, the following options are set, that can be overwritten using the standard jQuery plugin way.
 
 ```
 {
@@ -39,10 +39,8 @@ By default, the following options are set:
     deleteKeyCode: 68,
     multipleMarkers: true
 }
-
-You can overwrite then using the standard jQuery plugin way.
-
 ```
+
 Some remarks:
 + It is possible to use a custom marker icon. Below is an example of options passed in to use such a custom icon:
 
@@ -60,20 +58,15 @@ Some remarks:
 ## Events ##
 The coordinate picker currently fires the events listed below, of which some are standard Google Maps events that are given some more data. The data is always present in the data key of the event object. Every data object has a 'map' key that holds the Google Map that is associated with the current traffic map, as well as what's listed in the table below.
 
-### Map events
-| Event name                        | data                       |                  
-| coordinate_picker.center_changed  | lat and long of new center |                   
-| coordinate_picker.zoom_changed    | new zoom level             |                    
-
-### Marker events
-| Event name                           | data                          | remark                 |
-| coordinate_picker.marker_dragend     | marker that is clicked        | Instead of mouse event | 
-| coordinate_picker.marker_click       | marker that is clicked        | Instead of mouse event |
-| coordinate_picker.marker_rightclick  | marker that is richt clicked  | Instead of mouse event |
-| coordinate_picker.marker_dblclick    | marker that is dblclicked     | Instead of mouse event |                   
-### Coordinate picker events
-| Event name                       | data                                           | remark                 |
-| coordinate_picker.markers_changed | array of markers that are currently on the map | when a marker is added, deleted or dragged| 
+| Event name                          | data                         | remark                 |
+| ----------------------------------- | ---------------------------- | ---------------------- |
+| coordinate_picker.center_changed    | lat and long of new center   | Instead of mouse event |
+| coordinate_picker.zoom_changed      | new zoom level               | Instead of mouse event |
+| coordinate_picker.marker_dragend    | marker that is clicked       | Instead of mouse event | 
+| coordinate_picker.marker_click      | marker that is clicked       | Instead of mouse event |
+| coordinate_picker.marker_rightclick | marker that is richt clicked | Instead of mouse event |
+| coordinate_picker.marker_dblclick   | marker that is dblclicked    | Instead of mouse event |
+| coordinate_picker.markers_changed   | array of markers that are currently on the map | when a marker is added, deleted or dragged   | 
 
 
 
