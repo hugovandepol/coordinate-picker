@@ -2,20 +2,25 @@
 
 var $ = require('jquery');
 
-var googleLoaded = false;
-var loadCallback = null;
+// Load the Google Maps api taking into account possibly multiple coordinate picker instances
+var googleLoaded = false,
+    loadCallbacks = [];
 
-// Load the Google Maps api
 google.maps.event.addDomListener(window, 'load', function () {
     googleLoaded = true;
-        if (loadCallback) {
-            loadCallback();
+    if (loadCallbacks.length > 0) {
+        for (var i = 0; i < loadCallbacks.length; i += 1) {
+            loadCallbacks[i]();
+        }
     }
 });
 
 /**
  * Renders a Google Map in the element provided, on which markers can be added.
  * Markers can be dragged and deleted as well.
+ *
+ * It triggers events that other code can catch to process the data provided.
+ * Please refer to the readme for a listing of these events.
  *
  * @param element
  * @param options
@@ -46,6 +51,7 @@ CoordinatePicker.DEFAULTS = {
         scrollwheel: true,
         disableDoubleClickZoom: true
     },
+    marker: 'default',
     deleteKeyCode: 68,
     multipleMarkers: true
 };
@@ -58,11 +64,11 @@ CoordinatePicker.DEFAULTS = {
 CoordinatePicker.prototype.init = function () {
     var coordinatePicker = this;
 
-    // wait for google to load
+    // if the Google Api hasn't been loaded yet, wait with calling init on this coordinate picker
     if (!googleLoaded) {
-        loadCallback = function () {
+        loadCallbacks.push(function () {
             coordinatePicker.init();
-        };
+        });
         return this;
     }
 
@@ -77,13 +83,14 @@ CoordinatePicker.prototype.init = function () {
 
     this.map = new google.maps.Map(this.elem.get(0), this.options.map);
 
-    this.addEventListeners();
+    this.addMapListeners();
+    this.addDeleteKeyListeners();
 };
 
 /**
- * Adds event listeners
+ * Adds event listeners to the map
  */
-CoordinatePicker.prototype.addEventListeners = function () {
+CoordinatePicker.prototype.addMapListeners = function () {
     var coordinatePicker = this;
 
     // bind center changed handler
@@ -107,8 +114,15 @@ CoordinatePicker.prototype.addEventListeners = function () {
         coordinatePicker.addMarker(event.latLng.lat(), event.latLng.lng());
         coordinatePicker.triggerMarkersChanged();
     });
+};
 
-    // register listeners to the document that check if delete key is pressed
+/**
+ * Adds two listeners to the document to keep track of if the configured
+ * delete key is being pressed
+ */
+CoordinatePicker.prototype.addDeleteKeyListeners = function () {
+    var coordinatePicker = this;
+
     $(document).keydown(function (e) {
         coordinatePicker.dPressed = (e.keyCode === coordinatePicker.options.deleteKeyCode);
     });
@@ -119,54 +133,73 @@ CoordinatePicker.prototype.addEventListeners = function () {
 };
 
 /**
- * Triggers center changed event
+ * Triggers center changed event and sends with it the new center of the map
  */
 CoordinatePicker.prototype.triggerCenterChanged = function () {
    var center = this.map.getCenter(),
        data = {map: this.map, lat: center.lat(), lng: center.lng()};
-
    this.elem.trigger('coordinate_picker.center_changed', data);
+   console.log('center changed', data);
 };
 
 /**
- * Triggers zoom changed event
+ * Triggers zoom changed event and sends with it the new zoom level of the map
  */
 CoordinatePicker.prototype.triggerZoomChanged = function () {
     var data = {map: this.map, zoom: this.map.getZoom()};
     this.elem.trigger('coordinate_picker.zoom_changed', data);
-    console.log('zoom changed', data);
-
 };
 
 /**
  * Triggers markers changed event. Sends with it the current array of markers
  */
 CoordinatePicker.prototype.triggerMarkersChanged = function () {
-    var data = {markers: this.markers};
+    var data = {map: this.map, markers: this.markers};
     this.elem.trigger('coordinate_picker.markers_changed', data);
 };
 
 /**
- * Triggers marker dragged event
+ * Triggers marker dragend event
  *
  * @param m The marker that was dragged
  */
-CoordinatePicker.prototype.triggerMarkerDragged = function (m) {
-    var data = {marker: m};
-    this.elem.trigger('coordinate_picker.marker_dragged', data);
+CoordinatePicker.prototype.triggerMarkerDragend = function (m) {
+    var data = {map: this.map, marker: m};
+    this.elem.trigger('coordinate_picker.marker_dragend', data);
 };
 
 /**
- * Triggers marker clicked event
+ * Triggers marker click event
  *
  * @param m The marker that was clicked
  */
-CoordinatePicker.prototype.triggerMarkerClicked = function (m) {
-    var data = {marker: m};
-    this.elem.trigger('coordinate_picker.marker_clicked', data);
+CoordinatePicker.prototype.triggerMarkerClick = function (m) {
+    var data = {map: this.map, marker: m};
+    this.elem.trigger('coordinate_picker.marker_click', data);
 };
 
 /**
+ * Triggers marker double click event
+ *
+ * @param m The marker that was double clicked
+ */
+CoordinatePicker.prototype.triggerMarkerDblClick = function (m) {
+    var data = {marker: m};
+    this.elem.trigger('coordinate_picker.marker_dblclick', data);
+};
+
+/**
+ * Triggers marker right click event
+ *
+ * @param m The marker that was right clicked
+ */
+CoordinatePicker.prototype.triggerMarkerRightClick = function (m) {
+    var data = {marker: m};
+    this.elem.trigger('coordinate_picker.marker_rightclick', data);
+};
+
+/**
+ * Adds a marker to the map on the given lat lng position
  *
  * @param lat
  * @param lng
@@ -182,7 +215,7 @@ CoordinatePicker.prototype.addMarker = function (lat, lng) {
     };
 
     // add custom icon if we have one
-    if (coordinatePicker.options.marker.icon) {
+    if (coordinatePicker.options.marker !== 'default' && coordinatePicker.options.marker.icon) {
         markerOptions.icon = new google.maps.MarkerImage(
             this.options.marker.icon,
             null,
@@ -210,8 +243,18 @@ CoordinatePicker.prototype.addMarker = function (lat, lng) {
             coordinatePicker.triggerMarkersChanged();
         } else {
             // fire regular clicked event
-            coordinatePicker.triggerMarkerClicked(marker);
+            coordinatePicker.triggerMarkerClick(marker);
         }
+    });
+
+    // bind double click listener
+    google.maps.event.addListener(marker, 'dblclick', function (){
+        coordinatePicker.triggerMarkerDblClick(marker);
+    });
+
+    // bind right click listener
+    google.maps.event.addListener(marker, 'rightclick', function (){
+        coordinatePicker.triggerMarkerRightClick(marker);
     });
 
     // bind drag listener
@@ -223,7 +266,7 @@ CoordinatePicker.prototype.addMarker = function (lat, lng) {
             }
 
             // fire events
-            coordinatePicker.triggerMarkerDragged(marker);
+            coordinatePicker.triggerMarkerDragend(marker);
             coordinatePicker.triggerMarkersChanged();
         });
     });
@@ -253,15 +296,9 @@ $.fn.coordinatePicker = function (option) {
       data = new CoordinatePicker(this, options);
       $this.data('coordinatePicker', data);
     }
-
-    if (typeof option === 'string') {
-      if (option === '') {
-        // do something
-      }
-    }
   });
 
   return this;
 };
 
-exports.CoordinatePicker = CoordinatePicker;
+exports = CoordinatePicker;
