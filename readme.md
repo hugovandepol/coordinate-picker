@@ -5,9 +5,9 @@ Map. It keeps an internal array of markers that are currently present on the map
 
 ## Installation and usage ##
 The plugin can be installed via Bower using via `bower install tg-coordinate-picker`. Then require the plugin in your javascript file with `require('tg-coordinate-picker')`.
-```
 
-Usage:
+
+### Usage
 Create a div with a suitable width and height that will hold the Google Map. If the div has a class `coordinate-picker`, then simply call ` $('div.coordinatePicker').coordinatePicker()` on document ready. 
 
 By default, multiple markers can be placed on the map, by just clicking the map. To delete a marker, simply click it while holding down a configurable key. Currently, the default key to hold down is "d".
