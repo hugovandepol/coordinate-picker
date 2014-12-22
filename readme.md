@@ -60,6 +60,7 @@ The coordinate picker currently fires the events listed below, of which some are
 
 | Event name                          | data                         | remark                 |
 | ----------------------------------- | ---------------------------- | ---------------------- |
+| coordinate_picker.map_ready         | the map that loaded          | When map is ready      |
 | coordinate_picker.center_changed    | lat and long of new center   | Instead of mouse event |
 | coordinate_picker.zoom_changed      | new zoom level               | Instead of mouse event |
 | coordinate_picker.marker_dragend    | marker that is clicked       | Instead of mouse event | 

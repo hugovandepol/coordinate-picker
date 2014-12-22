@@ -85,6 +85,8 @@ CoordinatePicker.prototype.init = function () {
 
     this.addMapListeners();
     this.addDeleteKeyListeners();
+
+    coordinatePicker.triggerMapReady();
 };
 
 /**
@@ -130,6 +132,14 @@ CoordinatePicker.prototype.addDeleteKeyListeners = function () {
     $(document).keyup(function () {
         coordinatePicker.dPressed = false;
     });
+};
+
+/**
+ * Triggers map ready event when init function finished
+ */
+CoordinatePicker.prototype.triggerMapReady = function () {
+    var data = {map: this.map};
+    this.elem.trigger('coordinate_picker.map_ready', data);
 };
 
 /**
@@ -210,7 +220,7 @@ CoordinatePicker.prototype.addMarker = function (lat, lng) {
         draggable: true,
         clickable: true,
         position: new google.maps.LatLng(lat, lng),
-        map: this.map
+        map: coordinatePicker.map
     };
 
     // add custom icon if we have one
